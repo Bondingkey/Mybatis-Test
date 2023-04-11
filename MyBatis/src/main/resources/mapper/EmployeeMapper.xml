@@ -3,8 +3,10 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
+<!-- namespace要和你要映射的接口的全类名一样 -->
 <mapper namespace="com.gzc.mapper.EmployeeMapper">
-
+<!-- 标签名是你要做的数据库操作，id属性是接口中对应的方法名，在涉及到查询时要用到resultType的结果集类型，写全类名或别名 -->
+<!-- 有时候进行多表查询时，resultType就不能用了，需要使用resultMap -->
     <select id="selectEmpById"  resultType="employee">
 
         select
@@ -18,8 +20,10 @@
             id = #{empId};
 
     </select>
-
-    <insert id="insertEmp">
+<!-- 在添加的时候使用主键生成策略，并把添加的对象的主键值保存到id中 -->
+<!-- keyProperty通常放入的是表中的主键字段名 -->
+<!-- 写参数的时候,如果接口的方法的入参写的是POJO类型的入参,则到了映射文件中的占位符里写的就是相应POJO的属性 -->
+    <insert id="insertEmp" useGeneratedKeys="true" keyProperty="id">
 
         insert into
             tbl_employee(last_name, email, salary)
@@ -36,7 +40,7 @@
             id = #{empId};
 
     </delete>
-
+<!-- 写参数的时候,如果接口的方法的入参写的是POJO类型的入参,则到了映射文件中的占位符里写的就是相应POJO的属性 -->
     <update id="updateEmployeeById">
         update
             tbl_employee
@@ -50,6 +54,68 @@
 
     <select id="selectAllEmp" resultType="employee">
         select
+            last_name name,
+            email,
+            salary
+        from
+            tbl_employee
+    </select>
+
+    <select id="selectEmpByNameAndSalary" resultType="employee">
+        select
+            id,
+            last_name name,
+            email,
+            salary
+        from
+            tbl_employee
+        where
+            last_name=#{nametest}
+        and
+            salary=#{salarytest}
+    </select>
+
+    <select id="selectEmpByNameAndSalaryByMap" resultType="employee">
+        select
+            id,
+            last_name name,
+            email,
+            salary
+        from
+            tbl_employee
+        where
+            last_name=#{nameeee}
+        and
+            salary=#{sa}
+    </select>
+
+<!-- $占位符的使用,用来替换不支持?的情况,如from XX -->
+    <select id="selectEmpByTable" resultType="employee">
+        select
+            id,
+            last_name name,
+            email,
+            salary
+        from
+            ${tablename}
+    </select>
+
+<!-- //查询单行数据保存到Map集合中 -->
+    <select id="selectEmpByIdPutMap" resultType="map">
+        select
+            id,
+            last_name name,
+            email,
+            salary
+        from
+            tbl_employee
+        where
+            id = #{empId};
+    </select>
+
+    <select id="selectAllEmpPutMap">
+        select
+            id,
             last_name name,
             email,
             salary
