@@ -13,5 +13,10 @@ public interface DeptMapper{
 
     Dept selectDeptById(int id);
 
+    //通过部门id获取部门信息及其所属员工信息
+    Dept selectDeptAndEmpListByDeptId(int id);
+
+    //通过部门id获取部门信息以及所属员工信息(Coll分步查询)
+    Dept selectDeptAndEmpListByDeptIdStep(int id);
 
 }

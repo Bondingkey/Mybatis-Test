@@ -1,5 +1,7 @@
 package com.gzc.pojo;
 
+import java.io.Serializable;
+
 /**
  * @author: 拿破仑
  * @Date&Time: 2023/04/10  20:10  周一
@@ -7,14 +9,14 @@ package com.gzc.pojo;
  * @Write software: IntelliJ IDEA
  * @Purpose: 在此处编辑
  */
-public class Employee {
+public class Employee implements Serializable {//设置二级缓存需要实现的接口
 
     private Integer id;
     private String name;
     private Double salary;
     private String email;
 
-    //使员工和部门两个实体建立关系的属性
+    //使员工和部门两个实体建立一对一关系的属性
     private Dept dept;
 
     public Employee(Integer id, String name, Double salary, String email, Dept dept) {
@@ -24,6 +26,9 @@ public class Employee {
         this.email = email;
         this.dept = dept;
     }
+
+
+
 
     public Employee(Integer id, String name, Double salary, String email) {
         this.id = id;
@@ -85,6 +90,4 @@ public class Employee {
 
     public Employee() {
     }
-
-
 }

@@ -1,4 +1,6 @@
+import com.gzc.mapper.DeptMapper;
 import com.gzc.mapper.EmployeeMapper;
+import com.gzc.pojo.Dept;
 import com.gzc.pojo.Employee;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -8,10 +10,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author: 拿破仑
@@ -150,7 +149,6 @@ public class TestMybatis {
             //System.out.println(employeeMapper.getClass().getName());//带有$开头的类名为代理类
             List<Employee> employees = employeeMapper.selectAllEmp();
             employees.forEach(System.out::println);
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -175,8 +173,6 @@ public class TestMybatis {
 
             Employee employee = employeeMapper.selectEmpByNameAndSalary("张三", Double.valueOf(500));
             System.out.println(employee);
-
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -203,7 +199,6 @@ public class TestMybatis {
             map.put("sa",500);
             Employee employee = employeeMapper.selectEmpByNameAndSalaryByMap(map);
             System.out.println(employee);
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -314,10 +309,297 @@ public class TestMybatis {
             EmployeeMapper employeeMapper = sqlSession.getMapper(EmployeeMapper.class);
 
             Employee employee = employeeMapper.selectEmpAndDeptByIdAssociationStep(2);
-            System.out.println("employee = " + employee);
+            System.out.println("employee = " + employee.getDept());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
+    @Test
+    public void test13(){
+        try {
+            //mybatis配置文件所在位置
+            String resources= "mybatis-config.xml";
+            //加载mybatis配置文件
+            InputStream resourceAsStream = Resources.getResourceAsStream(resources);
+            //使用sqlSession工厂模式根据mybatis配置文件创建一个sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+            //使用sqlSessionFactory工厂创建一个openSession对象
+            SqlSession sqlSession = sqlSessionFactory.openSession();
+            //使用openSession对象获得EmployeeMapper.class的代理对象
+            DeptMapper mapper = sqlSession.getMapper(DeptMapper.class);
+            Dept dept = mapper.selectDeptAndEmpListByDeptId(1);
+            System.out.println("dept = " + dept);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void test14(){//通过部门id查询部门信息以及员工信息(coll的分布实验)
+        try {
+            //mybatis配置文件所在位置
+            String resources= "mybatis-config.xml";
+            //加载mybatis配置文件
+            InputStream resourceAsStream = Resources.getResourceAsStream(resources);
+            //使用sqlSession工厂模式根据mybatis配置文件创建一个sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+            //使用sqlSessionFactory工厂创建一个openSession对象
+            SqlSession sqlSession = sqlSessionFactory.openSession();
+            //使用openSession对象获得EmployeeMapper.class的代理对象
+            DeptMapper mapper = sqlSession.getMapper(DeptMapper.class);
+            Dept dept = mapper.selectDeptAndEmpListByDeptIdStep(1);
+            System.out.println("dept = " + dept);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void test15(){//动态SQL -if-where
+        try {
+            //mybatis配置文件所在位置
+            String resources= "mybatis-config.xml";
+            //加载mybatis配置文件
+            InputStream resourceAsStream = Resources.getResourceAsStream(resources);
+            //使用sqlSession工厂模式根据mybatis配置文件创建一个sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+            //使用sqlSessionFactory工厂创建一个openSession对象
+            SqlSession sqlSession = sqlSessionFactory.openSession();
+            //使用openSession对象获得EmployeeMapper.class的代理对象
+            EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
+
+            Employee employee = new Employee();
+            employee.setId(1);
+            employee.setName("张三");
+            //employee.setEmail("za@163.com");
+            List<Employee> employees = mapper.selectEmpByObject(employee);
+            employees.forEach(System.out::println);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void test16(){//动态SQL -trim
+        try {
+            //mybatis配置文件所在位置
+            String resources= "mybatis-config.xml";
+            //加载mybatis配置文件
+            InputStream resourceAsStream = Resources.getResourceAsStream(resources);
+            //使用sqlSession工厂模式根据mybatis配置文件创建一个sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+            //使用sqlSessionFactory工厂创建一个openSession对象
+            SqlSession sqlSession = sqlSessionFactory.openSession();
+            //使用openSession对象获得EmployeeMapper.class的代理对象
+            EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
+
+            Employee employee = new Employee();
+            employee.setId(1);
+            employee.setName("张三");
+            employee.setEmail("za@163.com");
+            //employee.setSalary(500.00);
+
+            List<Employee> employees = mapper.selectEmpByObjectOfTrim(employee);
+            employees.forEach(System.out::println);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void test17(){
+        try {
+            //mybatis配置文件所在位置
+            String resources= "mybatis-config.xml";
+            //加载mybatis配置文件
+            InputStream resourceAsStream = Resources.getResourceAsStream(resources);
+            //使用sqlSession工厂模式根据mybatis配置文件创建一个sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+            //使用sqlSessionFactory工厂创建一个openSession对象
+            SqlSession sqlSession = sqlSessionFactory.openSession();
+            //使用openSession对象获得EmployeeMapper.class的代理对象
+            EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
+
+            Employee employee = new Employee();
+            employee.setId(1);
+            employee.setName("张三");
+            employee.setEmail("za@164.com");
+            //employee.setSalary(500.00);
+
+            mapper.updateEmpByObject(employee);
+
+            sqlSession.commit();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void test18(){//动态SQL-when(选择语句)
+        try {
+            //mybatis配置文件所在位置
+            String resources= "mybatis-config.xml";
+            //加载mybatis配置文件
+            InputStream resourceAsStream = Resources.getResourceAsStream(resources);
+            //使用sqlSession工厂模式根据mybatis配置文件创建一个sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+            //使用sqlSessionFactory工厂创建一个openSession对象
+            SqlSession sqlSession = sqlSessionFactory.openSession();
+            //使用openSession对象获得EmployeeMapper.class的代理对象
+            EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
+
+            Employee employee = new Employee();
+            //employee.setId(1);
+            //employee.setName("kkk");
+            employee.setEmail("za@164.com");
+            employee.setSalary(500.00);
+
+            List<Employee> employees = mapper.selectEmpChoose(employee);
+            employees.forEach(System.out::println);
+            sqlSession.commit();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void test19(){//动态foreach(循环语句)
+        try {
+            //mybatis配置文件所在位置
+            String resources= "mybatis-config.xml";
+            //加载mybatis配置文件
+            InputStream resourceAsStream = Resources.getResourceAsStream(resources);
+            //使用sqlSession工厂模式根据mybatis配置文件创建一个sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+            //使用sqlSessionFactory工厂创建一个openSession对象
+            SqlSession sqlSession = sqlSessionFactory.openSession();
+            //使用openSession对象获得EmployeeMapper.class的代理对象
+            EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
+
+            List<Integer> objects = new ArrayList<>();
+            objects.add(1);
+            objects.add(7);
+            objects.add(10);
+
+            List<Employee> employees = mapper.selectEmpByIds(objects);
+
+            employees.forEach(System.out::println);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void test20(){//foreach练习:批量插入
+        try {
+            //mybatis配置文件所在位置
+            String resources= "mybatis-config.xml";
+            //加载mybatis配置文件
+            InputStream resourceAsStream = Resources.getResourceAsStream(resources);
+            //使用sqlSession工厂模式根据mybatis配置文件创建一个sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+            //使用sqlSessionFactory工厂创建一个openSession对象
+            SqlSession sqlSession = sqlSessionFactory.openSession();
+            //使用openSession对象获得EmployeeMapper.class的代理对象
+            EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
+
+            List<Employee> objects = new ArrayList<>();
+            objects.add(new Employee(null,"王五",50.5,"wangwu@.com"));
+            objects.add(new Employee(null,"王5五",50.5,"wangwu@.com"));
+            objects.add(new Employee(null,"王55五",50.5,"wangwu@.com"));
+            objects.add(new Employee(null,"王555五",50.5,"wangwu@.com"));
+
+            int i = mapper.batchInsert(objects);
+            System.out.println("i = " + i);
+
+            sqlSession.commit();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void test21(){//一级缓存实验
+        try {
+            //mybatis配置文件所在位置
+            String resources= "mybatis-config.xml";
+            //加载mybatis配置文件
+            InputStream resourceAsStream = Resources.getResourceAsStream(resources);
+            //使用sqlSession工厂模式根据mybatis配置文件创建一个sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+            //使用sqlSessionFactory工厂创建一个openSession对象
+            SqlSession sqlSession = sqlSessionFactory.openSession();
+            //使用openSession对象获得EmployeeMapper.class的代理对象
+            EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
+
+            Employee employee = mapper.selectEmpById(1);
+            System.out.println("employee = " + employee);
+            System.out.println("=========================================");
+            Employee employee1 = mapper.selectEmpById(1);
+            System.out.println("employee1 = " + employee1);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void test22(){//一级缓存失效的五种情况之一-不同的sqlSession
+        try {
+            //mybatis配置文件所在位置
+            String resources= "mybatis-config.xml";
+            //加载mybatis配置文件
+            InputStream resourceAsStream = Resources.getResourceAsStream(resources);
+            //使用sqlSession工厂模式根据mybatis配置文件创建一个sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+            //使用sqlSessionFactory工厂创建一个openSession对象
+            SqlSession sqlSession = sqlSessionFactory.openSession();
+            SqlSession sqlSession1 = sqlSessionFactory.openSession();
+            //使用openSession对象获得EmployeeMapper.class的代理对象
+            EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
+            EmployeeMapper mapper1 = sqlSession1.getMapper(EmployeeMapper.class);
+
+            Employee employee = mapper.selectEmpById(1);
+            System.out.println("employee = " + employee);
+            sqlSession.close();//资源释放
+            //sqlSession.clearCache();  //sqlSession.clearCache不会清除二级缓存
+            System.out.println("=========================================");
+            Employee employee1 = mapper1.selectEmpById(1);
+            System.out.println("employee1 = " + employee1);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void test23(){//一级缓存失效的五种情况之一:主动清空缓存或提交事务
+        try {
+            //mybatis配置文件所在位置
+            String resources= "mybatis-config.xml";
+            //加载mybatis配置文件
+            InputStream resourceAsStream = Resources.getResourceAsStream(resources);
+            //使用sqlSession工厂模式根据mybatis配置文件创建一个sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+            //使用sqlSessionFactory工厂创建一个openSession对象
+            SqlSession sqlSession = sqlSessionFactory.openSession();
+            //使用openSession对象获得EmployeeMapper.class的代理对象
+            EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
+
+            Employee employee = mapper.selectEmpById(1);
+            System.out.println("employee = " + employee);
+
+            //主动清空缓存或提交事务
+            //sqlSession.clearCache();
+            //sqlSession.commit();
+            System.out.println("=========================================");
+            Employee employee1 = mapper.selectEmpById(1);
+            System.out.println("employee1 = " + employee1);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 
 }

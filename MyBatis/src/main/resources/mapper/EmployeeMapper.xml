@@ -5,17 +5,27 @@
 
 <!-- namespace要和你要映射的接口的全类名一样 -->
 <mapper namespace="com.gzc.mapper.EmployeeMapper">
-<!-- 标签名是你要做的数据库操作，id属性是接口中对应的方法名，在涉及到查询时要用到resultType的结果集类型，写全类名或别名 -->
-<!-- 有时候进行多表查询时，resultType就不能用了，需要使用resultMap -->
-    <select id="selectEmpById"  resultType="employee">
 
+    <!-- 开启二级缓存 设置属性-->
+<!--    <cache eviction="FIFO" flushInterval="60000" size="1024" readOnly="false"></cache>-->
+    <cache></cache>
+    
+    <!-- sql可以提取重复的代码片段 -->
+    <sql id="selectEmp">
         select
             id,
             last_name name,
-            email,
-            salary
+            salary,
+            email
         from
             tbl_employee
+    </sql>
+    
+<!-- 标签名是你要做的数据库操作，id属性是接口中对应的方法名，在涉及到查询时要用到resultType的结果集类型，写全类名或别名 -->
+<!-- 有时候进行多表查询时，resultType就不能用了，需要使用resultMap -->
+    <select id="selectEmpById"  resultType="employee">
+<!-- 引用提取出来的sql片段 -->
+        <include refid="selectEmp"></include>
         where
             id = #{empId};
 
@@ -195,9 +205,9 @@
         <result column="last_name" property="name"></result>
         <result column="email" property="email"></result>
         <result column="salary" property="salary"></result>
-        <!-- 分布查询,需要指定第二部查询的方法和参数,select为方法全路径,column是给第二步查询指定参数 -->
+        <!-- 分布查询,需要指定第二部查询的方法和参数,select为方法全路径,column是给第二步查询指定参数,fetchType为是否开启局部懒加载 -->
         <!-- 不要忘记去配置信息注册第二部的xml文件 -->
-        <association property="dept" select="com.gzc.mapper.DeptMapper.selectDeptById" column="dept">
+        <association property="dept" select="com.gzc.mapper.DeptMapper.selectDeptById" column="dept" fetchType="lazy">
         </association>
     </resultMap>
     
@@ -214,5 +224,142 @@
             id=#{id}
     </select>
 
+<!-- coll分布查询第二步 -->
+    <select id="selectEmpByDeptId" resultType="employee">
+        select
+            id,
+            last_name name,
+            email,
+            salary,
+            dept_id
+        from
+            tbl_employee
+        where
+            dept_id=#{did}
+    </select>
+
+<!-- 跟据不确定的参数查询员工:动态SQL之if-where -->
+    <select id="selectEmpByObject" resultType="employee">
+        select
+            id,
+            last_name name,
+            email,
+            salary
+        from
+            tbl_employee
+        <!-- test后面的是属性,等号前的是数据库字段,#{}里面的是传过来的参数 -->
+        <where>
+            <if test="id != null">
+                id = #{id}
+            </if>
+            <if test="name != null">
+                and last_name = #{name}
+            </if>
+            <if test="email !=null">
+                and email = #{email}
+            </if>
+            <if test="salary !=null">
+                and salary = #{salary}
+            </if>
+        </where>
+    </select>
+
+<!-- 跟据不确定的参数查询员工:动态SQL之trim -->
+    <select id="selectEmpByObjectOfTrim" resultType="employee">
+        select
+            id,
+            last_name name,
+            email,
+            salary
+        from
+            tbl_employee
+        <trim prefix="where" suffixOverrides="and">
+            <if test="id != null">
+                id = #{id} and
+            </if>
+            <if test="name != null">
+                 last_name = #{name} and
+            </if>
+            <if test="email !=null">
+                 email = #{email} and
+            </if>
+            <if test="salary !=null">
+                 salary = #{salary}
+            </if>
+        </trim>
+    </select>
+
+<!-- 跟据不确定的参数修改员工:动态SQL之set -->
+    <update id="updateEmpByObject">
+        update
+            tbl_employee
+        <set>
+            <if test="name != null">
+                last_name = #{name},
+            </if>
+            <if test="email !=null">
+                email= #{email},
+            </if>
+            <if test="salary!=null">
+                salary= #{salary}
+            </if>
+        </set>
+        where
+            id = #{id};
+    </update>
+
+<!-- 动态SQL-when(选择结构) -->
+    <select id="selectEmpChoose" resultType="employee">
+        select
+            id,
+            last_name name,
+            email,
+            salary
+        from
+            tbl_employee
+        <where>
+            <choose>
+                <when test="id !=null">
+                    id = #{id}
+                </when>
+                <when test="name !=null">
+                    last_name = #{name}
+                </when>
+                <when test="email !=null">
+                    email = #{email}
+                </when>
+                <when test="salary !=null">
+                    salary = #{salary}
+                </when>
+                <otherwise></otherwise>
+            </choose>
+        </where>
+    </select>
+
+<!-- id in (1,2,3)查询id为1,和2和3的信息 -->
+<!-- foreach表示迭代,collection为要迭代的集合,item表示迭代出来的元素保存到哪里, separator表示元素之间的分隔符-->
+    <select id="selectEmpByIds" resultType="employee">
+        select
+            id,
+            last_name name,
+            salary,
+            email
+        from
+            tbl_employee
+        where
+            id in (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>)
+    </select>
+
+    <insert id="batchInsert">
+        insert into
+            tbl_employee (last_name, email, salary,dept_id)
+        VALUE
+        <foreach collection="empList" item="empList" separator=",">
+           (#{empList.name},#{empList.email},#{empList.salary},1)
+        </foreach>
+    </insert>
 
 </mapper>

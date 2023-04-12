@@ -54,6 +54,25 @@ public interface EmployeeMapper {
     //根据id查询员工以及员工所属部门(association分布查询实验)
     Employee selectEmpAndDeptByIdAssociationStep(int id);
 
+    //分布查询第二部
+    List<Employee> selectEmpByDeptId(int id);
 
+    //根据不确定的参数查询员工(动态SQL之if-where)
+    List<Employee> selectEmpByObject(Employee employee);
+
+    //根据不确定的参数查询员工(动态SQL之trim)
+    List<Employee> selectEmpByObjectOfTrim(Employee employee);
+
+    //动态SQL之修改--set
+    void updateEmpByObject(Employee employee);
+
+    //按条件查询-动态sql-choose
+    List<Employee> selectEmpChoose(Employee employee);
+
+    //通过多个id查询员工,集合中存储的是id的集合(foreach标签)
+    List<Employee> selectEmpByIds(@Param("ids") List<Integer> ids);
+
+    //批量插入员工(foreach标签的应用)
+    int batchInsert(@Param("empList") List<Employee> employeeList);
 
 }
