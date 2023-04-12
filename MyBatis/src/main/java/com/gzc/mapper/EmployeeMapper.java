@@ -45,6 +45,15 @@ public interface EmployeeMapper {
     @MapKey("id")//指定id作为map的key
     Map<Integer,Employee> selectAllEmpPutMap();
 
+    //根据id查询员工以及员工所属部门(多表联合查询实验)
+    List<Employee> selectEmpAndDeptById(int empid);
+
+    //根据id查询员工以及员工所属部门(association自定义映射实验)
+    Employee selectEmpAndDeptByIdAssociation(int empid);
+
+    //根据id查询员工以及员工所属部门(association分布查询实验)
+    Employee selectEmpAndDeptByIdAssociationStep(int id);
+
 
 
 }

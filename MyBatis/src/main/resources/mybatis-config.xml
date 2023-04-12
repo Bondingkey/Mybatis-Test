@@ -33,6 +33,7 @@
 
     <mappers>
         <mapper resource="mapper/EmployeeMapper.xml"/>
+        <mapper resource="mapper/DeptMapper.xml" />
     </mappers>
 
 </configuration>

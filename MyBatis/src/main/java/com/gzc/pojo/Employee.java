@@ -14,6 +14,24 @@ public class Employee {
     private Double salary;
     private String email;
 
+    //使员工和部门两个实体建立关系的属性
+    private Dept dept;
+
+    public Employee(Integer id, String name, Double salary, String email, Dept dept) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+        this.email = email;
+        this.dept = dept;
+    }
+
+    public Employee(Integer id, String name, Double salary, String email) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+        this.email = email;
+    }
+
     @Override
     public String toString() {
         return "Employee{" +
@@ -21,7 +39,16 @@ public class Employee {
                 ", name='" + name + '\'' +
                 ", salary=" + salary +
                 ", email='" + email + '\'' +
+                ", dept=" + dept +
                 '}';
+    }
+
+    public Dept getDept() {
+        return dept;
+    }
+
+    public void setDept(Dept dept) {
+        this.dept = dept;
     }
 
     public Integer getId() {
@@ -59,10 +86,5 @@ public class Employee {
     public Employee() {
     }
 
-    public Employee(Integer id, String name, Double salary, String email) {
-        this.id = id;
-        this.name = name;
-        this.salary = salary;
-        this.email = email;
-    }
+
 }

@@ -123,4 +123,96 @@
             tbl_employee
     </select>
 
+<!-- 根据id查询员工以及员工所属部门(多表联合查询实验) -->
+    <!-- 自定义映射:员工与部门的关系 -->
+    <!-- id里面是自定义映射的名字课随便起,type类似以那个实体类的形式体现 -->
+    <resultMap id="EmpAndDeptResultMap" type="employee">
+        <!-- id标签为主键标签,result为非主键标签,column里写表字段名,property写对象属性名,从此建立关联 -->
+        <id column="id" property="id"></id>
+        <result column="last_name" property="name"></result>
+        <result column="email" property="email"></result>
+        <result column="salary" property="salary"></result>
+        <!-- 为第二张表建立映射 -->
+        <result column="dept_id" property="dept.deptId"></result>
+        <result column="dept_name" property="dept.deptName"></result>
+    </resultMap>
+
+    <select id="selectEmpAndDeptById" resultMap="EmpAndDeptResultMap">
+        select
+            e.id,
+            e.last_name,
+            e.email,
+            e.salary,
+            d.dept_id,
+            d.dept_name
+        from
+            tbl_dept d,
+            tbl_employee e
+        where
+            d.dept_id=e.dept_id
+        and
+            e.id=#{empid}
+    </select>
+
+<!-- 根据id查询员工以及员工所属部门(association自定义映射实验) -->
+    <resultMap id="EmpAndDeptResultMapAssociation" type="employee">
+        <!-- id标签为主键标签,result为非主键标签,column里写表字段名,property写对象属性名,从此建立关联 -->
+        <id column="id" property="id"></id>
+        <result column="last_name" property="name"></result>
+        <result column="email" property="email"></result>
+        <result column="salary" property="salary"></result>
+        <!-- 为第二张表建立映射 -->
+        <!-- property里填属性的名称,javaType中填属性的类型的全类名 -->
+        <association property="dept" javaType="com.gzc.pojo.Dept">
+            <id column="dept_id" property="deptId"></id>
+            <result column="dept_name" property="deptName"></result>
+        </association>
+    </resultMap>
+
+    <select id="selectEmpAndDeptByIdAssociation" resultMap="EmpAndDeptResultMapAssociation">
+
+        select
+            e.id,
+            e.last_name,
+            e.email,
+            e.salary,
+            d.dept_id,
+            d.dept_name
+        from
+            tbl_dept d,
+            tbl_employee e
+        where
+            d.dept_id=e.dept_id
+        and
+            e.id=#{empid}
+    </select>
+
+<!-- 根据id查询员工以及员工所属部门(association分布查询实验) -->
+    <!-- 1,先根据id查询员工 -->
+    <!-- 2,根据部门id查询部门 -->
+    <resultMap id="selectEmpAndDeptByIdAssociationStep" type="employee">
+        <id column="id" property="id"></id>
+        <result column="last_name" property="name"></result>
+        <result column="email" property="email"></result>
+        <result column="salary" property="salary"></result>
+        <!-- 分布查询,需要指定第二部查询的方法和参数,select为方法全路径,column是给第二步查询指定参数 -->
+        <!-- 不要忘记去配置信息注册第二部的xml文件 -->
+        <association property="dept" select="com.gzc.mapper.DeptMapper.selectDeptById" column="dept">
+        </association>
+    </resultMap>
+    
+    <select id="selectEmpAndDeptByIdAssociationStep" resultMap="selectEmpAndDeptByIdAssociationStep">
+        select
+            id,
+            last_name,
+            email,
+            salary,
+            dept_id dept
+        from
+            tbl_employee
+        where
+            id=#{id}
+    </select>
+
+
 </mapper>
