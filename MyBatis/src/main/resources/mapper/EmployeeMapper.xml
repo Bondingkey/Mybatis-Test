@@ -8,8 +8,9 @@
 
     <!-- 开启二级缓存 设置属性-->
 <!--    <cache eviction="FIFO" flushInterval="60000" size="1024" readOnly="false"></cache>-->
-    <cache></cache>
-    
+    <!-- 设置第三方缓存 -->
+    <cache type="org.mybatis.caches.ehcache.EhcacheCache"></cache>
+
     <!-- sql可以提取重复的代码片段 -->
     <sql id="selectEmp">
         select
@@ -20,7 +21,7 @@
         from
             tbl_employee
     </sql>
-    
+
 <!-- 标签名是你要做的数据库操作，id属性是接口中对应的方法名，在涉及到查询时要用到resultType的结果集类型，写全类名或别名 -->
 <!-- 有时候进行多表查询时，resultType就不能用了，需要使用resultMap -->
     <select id="selectEmpById"  resultType="employee">
@@ -50,6 +51,7 @@
             id = #{empId};
 
     </delete>
+
 <!-- 写参数的时候,如果接口的方法的入参写的是POJO类型的入参,则到了映射文件中的占位符里写的就是相应POJO的属性 -->
     <update id="updateEmployeeById">
         update
@@ -64,6 +66,7 @@
 
     <select id="selectAllEmp" resultType="employee">
         select
+            id,
             last_name name,
             email,
             salary
@@ -180,7 +183,6 @@
     </resultMap>
 
     <select id="selectEmpAndDeptByIdAssociation" resultMap="EmpAndDeptResultMapAssociation">
-
         select
             e.id,
             e.last_name,
@@ -210,7 +212,7 @@
         <association property="dept" select="com.gzc.mapper.DeptMapper.selectDeptById" column="dept" fetchType="lazy">
         </association>
     </resultMap>
-    
+
     <select id="selectEmpAndDeptByIdAssociationStep" resultMap="selectEmpAndDeptByIdAssociationStep">
         select
             id,

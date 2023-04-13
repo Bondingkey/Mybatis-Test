@@ -27,9 +27,6 @@ public class Employee implements Serializable {//设置二级缓存需要实现�
         this.dept = dept;
     }
 
-
-
-
     public Employee(Integer id, String name, Double salary, String email) {
         this.id = id;
         this.name = name;

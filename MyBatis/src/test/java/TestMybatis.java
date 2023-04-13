@@ -1,3 +1,6 @@
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.gzc.mapper.DeptMapper;
 import com.gzc.mapper.EmployeeMapper;
 import com.gzc.pojo.Dept;
@@ -408,7 +411,7 @@ public class TestMybatis {
     }
 
     @Test
-    public void test17(){
+    public void test17(){//跟据不确定的参数修改员工:动态SQL之set
         try {
             //mybatis配置文件所在位置
             String resources= "mybatis-config.xml";
@@ -595,6 +598,82 @@ public class TestMybatis {
             System.out.println("=========================================");
             Employee employee1 = mapper.selectEmpById(1);
             System.out.println("employee1 = " + employee1);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void test24(){//测试分页插件的使用
+        try {
+            //mybatis配置文件所在位置
+            String resources= "mybatis-config.xml";
+            //加载mybatis配置文件
+            InputStream resourceAsStream = Resources.getResourceAsStream(resources);
+            //使用sqlSession工厂模式根据mybatis配置文件创建一个sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+            //使用sqlSessionFactory工厂创建一个openSession对象
+            SqlSession sqlSession = sqlSessionFactory.openSession();
+            //使用openSession对象获得EmployeeMapper.class的代理对象
+            EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
+
+            //查询之前使用分页插件开始分页
+            //第一个参数为页数,第二个参数为第几页
+            //可以接受返回值拿到分页的一些数据
+            Page<Object> pagehelperdate  = PageHelper.startPage(2, 2);
+
+            //开始查询,体验分页
+            List<Employee> employees = mapper.selectAllEmp();
+            employees.forEach(System.out::println);
+
+            //使用分页插件返回的数据体验别的操作
+            int allpages = pagehelperdate.getPages();//总页数
+            int pageNum = pagehelperdate.getPageNum();//当前页数
+            System.out.println(pageNum+"/"+allpages);
+            System.out.println("总数据条数"+pagehelperdate.getTotal());
+            System.out.println("当前页的数据数"+pagehelperdate.getPageSize());
+            List<Object> result = pagehelperdate.getResult();
+            result.forEach(System.out::println);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void test25(){//测试分页之后查询之后封装到PageInfo中
+        try {
+            //mybatis配置文件所在位置
+            String resources= "mybatis-config.xml";
+            //加载mybatis配置文件
+            InputStream resourceAsStream = Resources.getResourceAsStream(resources);
+            //使用sqlSession工厂模式根据mybatis配置文件创建一个sqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+            //使用sqlSessionFactory工厂创建一个openSession对象
+            SqlSession sqlSession = sqlSessionFactory.openSession();
+            //使用openSession对象获得EmployeeMapper.class的代理对象
+            EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
+
+            //查询之前使用分页插件开始分页
+            //第一个参数为页数,第二个参数为第几页
+            //可以接受返回值拿到分页的一些数据
+            PageHelper.startPage(2, 2);
+
+            //开始查询,体验分页
+            List<Employee> employees = mapper.selectAllEmp();
+
+            //开始封装,将查询到的结果当作入参,默认值8
+            PageInfo<Employee> pageInfo = new PageInfo<>(employees,5);
+
+            //使用pageInfo来操作数据
+            System.out.println(pageInfo.getPageNum()+"/"+pageInfo.getPages());
+            System.out.println("总数据条数"+pageInfo.getTotal());
+            System.out.println("每页的数据数"+pageInfo.getPageSize());
+            System.out.println("当前页的数据集合:");
+            List<Employee> list = pageInfo.getList();
+            list.forEach(System.out::println);
+            System.out.println("是否有上一页"+pageInfo.isHasPreviousPage());
+            System.out.println("上一页"+pageInfo.getPrePage());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

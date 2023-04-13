@@ -1,0 +1,29 @@
+<!DOCTYPE generatorConfiguration PUBLIC
+        "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <!-- id:设置一个唯一标识
+     targetRuntime属性值说明:
+     Mybatis3Simple:基本的CRUD
+     MyBatis3:带条件的CRUD
+     -->
+    <context id="simple" targetRuntime="MyBatis3">
+        <!-- 设置链接数据库的相关信息 -->
+        <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/test_mybatis?serverTimezone=UTC"
+                        userId="root"
+                        password="GUAN0310">
+            <property name="nullCatalogMeansCurrent" value="true"/>
+        </jdbcConnection>
+<!-- 设置JavaBean的生成策略 -->
+        <javaModelGenerator targetPackage="com.gzc.pojo" targetProject="src/main/java"/>
+<!-- 设置SQL映射文件的生成策略 -->
+        <sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources"></sqlMapGenerator>
+<!-- 设置Mapper接口的生产策略 -->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.gzc.mapper" targetProject="src/main/java"/>
+<!-- 逆向分析的表 -->
+        <table tableName="tbl_employee" domainObjectName="Employee" />
+        <table tableName="tbl_dept" domainObjectName="Dept" />
+    </context>
+</generatorConfiguration>
